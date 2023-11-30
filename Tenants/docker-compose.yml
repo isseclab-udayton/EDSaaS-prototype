@@ -1,0 +1,33 @@
+version: "3.5"
+services:
+    # tenant_1:
+    #   build:
+    #     context: ./Tenant1-Publisher/Surveillance-Camera
+    #   networks:
+    #     - default
+
+    fire_alert_server:
+        build:
+            context: ./Tenant2/FireAlertServer
+        expose:
+            - "3000"
+        ports:
+            - "3009:3000"
+        networks:
+            - cloud
+
+    tenant_web:
+        build:
+            context: ./Tenant-Web
+        ports:
+            - "30000:3000"
+        networks:
+            - edgehub_public
+    
+
+
+networks:
+    edgehub_public:
+        external: true
+    cloud:
+        external: true

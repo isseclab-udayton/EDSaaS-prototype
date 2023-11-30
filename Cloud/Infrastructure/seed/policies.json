@@ -1,0 +1,252 @@
+[
+    {
+        "_id": {
+            "$oid": "60eb5488a8226c4700c9cebb"
+        },
+        "tenant_name": "tenant-1",
+        "policies": [
+            {
+                "Name": "Allow Tenant-1 of City Surveillance to publish to the stream",
+                "Effect": "Allow",
+                "Action": ["publish"],
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/store_x/city_surveillance"
+                ]
+            },
+            {
+                "Name": "Allow Tenant-1 of Kitchen Surveillance to publish to the stream",
+                "Effect": "Allow",
+                "Action": ["publish"],
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/kitchen_x/city_surveillance"
+                ]
+            },
+            {
+                "Name": "Allow Fire detection AI to publish the fire alert",
+                "Action": ["publish"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/fire_detected/usa/ohio/kitchen_x/city_ai"
+                ]
+            },
+            {
+                "Name": "Allow Kitchen AI to subscribe the Video",
+                "Effect": "Allow",
+                "Action": ["subscribe"],
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/kitchen_x/city_surveillance"
+                ]
+            }
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "60eb55667a811456f0ec37bb"
+        },
+        "tenant_name": "tenant-2",
+        "policies": [
+            {
+                "id": "1",
+                "Name": "Allow City AI to subscribe the Video",
+                "Effect": "Allow",
+                "Action": ["subscribe"],
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/store_x/city_surveillance"
+                ]
+            },
+            {
+                "Name": "Allow City AI to publish the people count",
+                "Action": ["publish"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/people_count/usa/ohio/store_x/city_ai"
+                ]
+            },
+            {
+                "Name": "Allow City AI to subscribe the people count",
+                "Action": ["subscribe"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/people_count/usa/ohio/store_x/city_ai"
+                ]
+            },
+            {
+                "Name": "Allow Kitchen AI to subscribe the Video",
+                "Effect": "Allow",
+                "Action": ["subscribe"],
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/kitchen_x/city_surveillance"
+                ]
+            },
+            {
+                "Name": "Allow Kitchen AI to publish the people count",
+                "Action": ["publish"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/people_count/usa/ohio/kitchen_x/city_ai"
+                ]
+            },
+            {
+                "Name": "Allow PUT request to http://localhost:3009/people_count",
+                "Effect": "Allow",
+                "Action": ["PUT"],
+                "Resource": ["http://localhost:3009/people_count"],
+                "Condition": {
+                    "AnyOf": [
+                        {
+                            "object": "fire_detected",
+                            "location": "kitchen_x",
+                            "max_5mins": {
+                                "eq": 1
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "Name": "Allow PUT request to http://localhost:3009/people_count from inside docker container",
+                "Effect": "Allow",
+                "Action": ["PUT"],
+                "Resource": ["http://192.168.1.156:3009/people_count"],
+                "Condition": {
+                    "AnyOf": [
+                        {
+                            "object": "fire_detected",
+                            "location": "kitchen_x",
+                            "max_5mins": {
+                                "eq": 1
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "60eb56587a811456f0ec37be"
+        },
+        "tenant_name": "tenant-3",
+        "policies": [
+            {
+                "Name": "Allow tenant-3 to subscribe the People Count",
+                "Action": ["subscribe"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/people_count/usa/ohio/store_x/city_ai"
+                ]
+            },
+            {
+                "Name": "Allow tenant-3 to subscribe the Video if people count >= 10 for 5 minutes",
+                "Action": ["subscribe"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/store_x/city_surveillance"
+                ],
+                "Condition": {
+                    "AnyOf": [
+                        {
+                            "object": "people_count",
+                            "location": "store_x",
+                            "max_5mins": {
+                                "gt": 15
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "Name": "Allow PUT request to http://httpbin.org/put",
+                "Effect": "Allow",
+                "Action": ["PUT"],
+                "Resource": ["http://httpbin.org/put"],
+                "Condition": {
+                    "AnyOf": [
+                        {
+                            "object": "fire_detected",
+                            "location": "kitchen_x",
+                            "max_5mins": {
+                                "gt": 0
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "60eb56a27a811456f0ec37c0"
+        },
+        "tenant_name": "tenant-4",
+        "policies": [
+            {
+                "Name": "Allow tenant-4 to subscribe the People Count",
+                "Action": ["subscribe"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/people_count/usa/ohio/store_x/city_ai"
+                ]
+            },
+            {
+                "Name": "Allow tenant-4 to subscribe the Video if people count >= 30 for 5 minutes",
+                "Action": ["stream"],
+                "Effect": "Allow",
+                "Resource": [
+                    "/smartcity/camera/stream/usa/ohio/store_x/city_surveillance"
+                ],
+                "Condition": {
+                    "AnyOf": [
+                        {
+                            "object": "people_count",
+                            "location": "store_x",
+                            "max_5mins": {
+                                "gt": 30
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "60eca969e8b037173c7abb9e"
+        },
+        "tenant_name": "context_sensing",
+        "policies": [
+            {
+                "Name": "Context Sensing can read everything",
+                "Effect": "Allow",
+                "Action": ["subscribe"],
+                "Resource": ["/*/*/*/*"]
+            },
+            {
+                "Name": "Context Sensing can read everything",
+                "Effect": "Allow",
+                "Action": ["subscribe"],
+                "Resource": ["/*/*/*/*/*/*/*"]
+            },
+            {
+                "Name": "Context Sensing can publish everything",
+                "Effect": "Allow",
+                "Action": ["publish"],
+                "Resource": ["/*/*/*/*"]
+            }
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "60ecbce9e8b037173c7abba0"
+        },
+        "tenant_name": "mqtt_system",
+        "policies": [
+            {
+                "Name": "MQTT System can produce metrics about data amount",
+                "Effect": "Allow",
+                "Action": ["publish"],
+                "Resource": ["/hub/data_amount/mqtt/*"]
+            }
+        ]
+    }
+]

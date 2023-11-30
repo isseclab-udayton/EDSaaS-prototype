@@ -1,0 +1,34 @@
+version: "3.5"
+services:
+    person_count_fire_kitchen:
+        build:
+            context: ./PersonCountFireKitchen
+        networks:
+            - edgehub_public
+            - edgehub_tenant_apps
+            - proxy_network
+
+    person_count_city:
+        build:
+            context: ./PersonCountCity
+        networks:
+            - edgehub_public
+            - edgehub_tenant_apps
+            - proxy_network
+
+    # http_test:
+    #     build:
+    #         context: ./HttpTest
+    #     networks:
+    #         - edgehub_public
+    #         - edgehub_tenant_apps
+    #         - proxy_network
+
+
+networks:
+    edgehub_tenant_apps:
+        external: true
+    proxy_network:
+        external: true
+    edgehub_public:
+        external: true

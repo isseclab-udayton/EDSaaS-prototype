@@ -1,0 +1,135 @@
+version: "3.5"
+services:
+    streaming-service:
+        build:
+            context: ./Streaming-Service
+        expose:
+            - "1935"
+            - "8088"
+        ports:
+            - "1935:1935"
+            - "8088:8088"
+        networks:
+            - edgehub_private
+            - edgehub_public
+            - edgehub_tenant_apps
+
+    streaming-auth:
+        build:
+            context: ./Streaming-Auth
+        environment:
+            OPA_HOST: ${OPA_HOST}
+            AUTHENTICATION_HOST: ${AUTHENTICATION_HOST}
+        networks:
+            - edgehub_private
+            - cloud
+
+    virtual-mqtt:
+        build:
+            context: ./VirtualMQTT
+        depends_on:
+            - opa_tenant-1
+            - opa_tenant-2
+            - opa_context_sensing
+        environment:
+            OPA_HOST: ${OPA_HOST}
+            AUTHENTICATION_HOST: ${AUTHENTICATION_HOST}
+        expose:
+            - "1883"
+            - "8888"
+        ports:
+            - "1883:1883"
+            - "8888:8888"
+        networks:
+            - edgehub_private
+            - edgehub_public
+            - edgehub_tenant_apps
+            - cloud
+
+    context-sensing:
+        build:
+            context: ./ContextSensing
+        depends_on:
+            - virtual-mqtt
+        environment:
+            MQTT_HOST: ${MQTT_HOST}
+            BOOTSTRAP_KAFKA_HOST: ${BOOTSTRAP_KAFKA_HOST}
+            API: ${AUTHENTICATION_HOST}
+
+        networks:
+            - edgehub_private
+            - cloud
+
+    policy_synchronizer:
+        build:
+            context: ./Policy-Synchronizer
+        environment:
+            MQTT_HOST: ${MQTT_HOST}
+            BOOTSTRAP_KAFKA_HOST: ${BOOTSTRAP_KAFKA_HOST}
+        networks:
+            - edgehub_private
+            - cloud
+
+    opa_context_sensing:
+        build:
+            context: ./OPA
+        ports:
+            - "8181:8181"
+        networks:
+            - edgehub_private
+
+    opa_mqtt_system:
+        build:
+            context: ./OPA
+        ports:
+            - "8182:8181"
+        networks:
+            - edgehub_private
+
+    opa_tenant-1:
+        build:
+            context: ./OPA
+        ports:
+            - "18181:8181"
+        networks:
+            - edgehub_private
+
+    opa_tenant-2:
+        build:
+            context: ./OPA
+        ports:
+            - "18182:8181"
+        networks:
+            - edgehub_private
+
+    opa_tenant-3:
+        build:
+            context: ./OPA
+        ports:
+            - "18183:8181"
+        networks:
+            - edgehub_private
+
+    opa_tenant-4:
+        build:
+            context: ./OPA
+        ports:
+            - "18184:8181"
+        networks:
+            - edgehub_private
+
+networks:
+    cloud:
+        external: true
+    edgehub_private:
+        external: false
+        name: edgehub_private
+    edgehub_public:
+        external: false
+        name: edgehub_public
+    edgehub_tenant_apps:
+        external: false
+        internal: true
+        driver: bridge
+        name: edgehub_tenant_apps
+
